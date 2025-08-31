@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>kids blockz — block coding for all ages</title>
+  <meta name="description" content="kids blockz — a block‑coding playground with real‑world missions, arrow‑key input, and a colorful kid‑friendly UI. No accounts. No ads. Just make, test, learn." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Sora:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      /* palette: friendly yet mature */
+      --bg:#0a0e24;          /* deep night */
+      --panel:#0f153a;       /* indigo */
+      --ink:#eef1ff;         /* soft white */
+      --muted:#a9b2ff;       /* periwinkle */
+      --accent:#ffd166;      /* honey */
+      --accent-2:#06d6a0;    /* mint */
+      --accent-3:#118ab2;    /* ocean */
+      --accent-4:#ef476f;    /* raspberry */
+      --accent-5:#7c5cff;    /* violet */
+      --block-blue:#2d7ff9;
+      --block-green:#21c483;
+      --block-yellow:#f2c94c;
+      --block-pink:#ff6fa9;
+      --block-purple:#a66bff;
+      --shadow: 0 10px 25px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    html,body{height:100%;}
+    body{margin:0;background: radial-gradient(1200px 600px at 20% -10%, #1a2057 0%, transparent 70%), radial-gradient(1000px 700px at 120% 10%, #1a2057 0%, transparent 60%), var(--bg); color:var(--ink); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;}
+    .container{max-width:1200px;margin:0 auto;padding:24px;}
+    .hero{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:center;padding:32px 0;}
+    .logo{display:flex;gap:10px;align-items:center;font-family:"Sora", sans-serif;font-weight:800;font-size:28px;letter-spacing:.3px}
+    .logo .dot{width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 0 0 6px rgba(255,209,102,.15),0 0 18px rgba(6,214,160,.35)}
+    .chip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:12px}
+    .cta{display:flex;gap:12px;margin-top:18px}
+    button.btn{cursor:pointer;border:none;border-radius:16px;padding:14px 18px;font-weight:800;letter-spacing:.3px;box-shadow:var(--shadow);transition:.2s transform ease,.25s box-shadow ease, .25s filter ease}
+    .btn.primary{background:linear-gradient(135deg,var(--accent-2),var(--accent));color:#0a0a0a;display:inline-flex;gap:8px;align-items:center}
+    .btn.secondary{background:linear-gradient(135deg,var(--accent-3),var(--accent-5));color:#fff;display:inline-flex;gap:8px;align-items:center}
+    button.btn:hover{transform:translateY(-2px)}
+
+    /* simple inline "icon" (SVG) styling */
+    .icon{width:16px;height:16px;display:inline-block;vertical-align:-2px}
+
+    /* App Shell */
+    .tabs{display:flex;gap:8px;margin-top:24px}
+    .tab{padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--muted);cursor:pointer;font-weight:700}
+    .tab.active{background:linear-gradient(135deg,#3e46a9,#7b5cff);color:#fff}
+    .page{display:none;margin-top:18px}
+    .page.active{display:block}
+
+    /* Playground */
+    .playground{display:grid;grid-template-columns:260px 1fr 380px;gap:16px}
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));backdrop-filter: blur(4px);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:12px;box-shadow:var(--shadow)}
+    .panel h3{margin:6px 10px 12px;font-size:14px;color:var(--muted);letter-spacing:.3px}
+
+    .block{user-select:none;cursor:grab;border-radius:12px;padding:10px 12px;margin:8px 0;color:#0b0b0b;font-weight:800;box-shadow:0 6px 16px rgba(0,0,0,.25);display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .block .slot{min-width:36px; padding:6px 8px;border-radius:10px;background:#fff3;border: 1px dashed rgba(0,0,0,.2); color:#0b0b0b}
+    .block small{opacity:.75;font-weight:700}
+    .cat{font-size:12px;color:#fff;padding:6px 10px;border-radius:999px;margin:6px 8px;display:inline-block}
+    .cat.motion{background:linear-gradient(135deg,#2d7ff9,#00e0ff)}
+    .cat.looks{background:linear-gradient(135deg,#ff6fa9,#ffd1e6)}
+    .cat.control{background:linear-gradient(135deg,#f2c94c,#ff9f1c)}
+
+    .palette .block{display:block}
+    .b-blue{background:linear-gradient(135deg,#2d7ff9,#67c1ff)}
+    .b-green{background:linear-gradient(135deg,#21c483,#a3ffd7)}
+    .b-yellow{background:linear-gradient(135deg,#f2c94c,#ffe27a)}
+    .b-pink{background:linear-gradient(135deg,#ff6fa9,#ffb0d0)}
+    .b-purple{background:linear-gradient(135deg,#a66bff,#d0b6ff)}
+
+    .workspace{min-height:420px}
+    .stack{min-height:380px;border-radius:14px;background:rgba(0,0,0,.15);border:1px dashed rgba(255,255,255,.18);padding:10px}
+    .stack .block{width:calc(100% - 12px);}
+
+    .stageWrap{display:grid;grid-template-rows:auto 1fr auto;gap:8px}
+    .toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between}
+    .toolbar .stat{font-size:12px;color:var(--muted)}
+    canvas#stage{width:100%;height:320px;background: radial-gradient(1000px 300px at 40% -40%, #3348ad 0%, transparent 40%), linear-gradient(180deg,#2a2f6d 0,#1b204d 60%, #14183b 100%);border-radius:14px;border:1px solid rgba(255,255,255,.08)}
+
+    .goalbar{display:flex;gap:8px;align-items:center;justify-content:space-between;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:8px 10px;border-radius:14px}
+    .goalbar .goaltext{font-size:13px;color:#fff}
+    .goalbar .status{font-weight:800}
+
+    .lessons{display:grid;grid-template-columns: 300px 1fr;gap:14px}
+    .lesson-list{max-height:540px;overflow:auto}
+    .lesson-item{padding:12px;border-radius:12px;margin:8px 0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);cursor:pointer}
+    .lesson-item.active{outline:2px solid var(--accent)}
+    .lesson-body{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px}
+    .lesson-body h4{margin:0 0 8px}
+    .lesson-body .md{line-height:1.6;white-space:pre-wrap}
+
+    h1,h2,h3,h4,h5,h6{font-family:'Sora', sans-serif;}
+
+    @media (max-width: 980px){
+      .hero{grid-template-columns:1fr}
+      .playground{grid-template-columns:1fr}
+      .lessons{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo"><span class="dot"></span> kids blockz</div>
+    <!-- HERO / LANDING -->
+    <section id="landing" class="hero">
+      <div>
+        <span class="chip">block‑coding • all ages</span>
+        <h1 style="font-size:44px;line-height:1.05;margin:10px 0 8px;font-family:'Sora', sans-serif">Build stories, games, and real‑world projects.</h1>
+        <p style="color:var(--muted);max-width:60ch;font-size:16px">Drag colorful blocks, snap them together, and watch your sprite come alive on the stage. Then follow goal‑based missions designed around everyday scenarios—deliveries, traffic lights, treasure maps, and more. Arrow‑key controls are enabled on the stage.</p>
+        <div class="cta">
+          <button class="btn primary" onclick="Nav.go('play')">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Start Coding
+          </button>
+          <button class="btn secondary" onclick="Nav.go('learn')">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+            Browse Missions
+          </button>
+        </div>
+      </div>
+      <div class="panel" style="padding:0; overflow:hidden">
+        <canvas id="heroStage" width="560" height="360"></canvas>
+      </div>
+    </section>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab active" data-page="play" onclick="Nav.go('play')">Playground</div>
+      <div class="tab" data-page="learn" onclick="Nav.go('learn')">Missions</div>
+      <div class="tab" data-page="about" onclick="Nav.go('about')">About</div>
+    </div>
+
+    <!-- PLAYGROUND -->
+    <section id="play" class="page active">
+      <div class="playground">
+        <!-- Palette -->
+        <div class="panel palette">
+          <h3>Blocks</h3>
+          <span class="cat motion">Motion</span>
+          <div class="block b-blue" draggable="true" data-op="move" data-arg1="10">move <input class="slot" type="number" value="10"/> steps</div>
+          <div class="block b-blue" draggable="true" data-op="turn">turn <input class="slot" type="number" value="15"/> degrees</div>
+          <div class="block b-blue" draggable="true" data-op="goto">go to x <input class="slot" type="number" value="0"/> y <input class="slot" type="number" value="0"/></div>
+
+          <span class="cat looks">Looks</span>
+          <div class="block b-pink" draggable="true" data-op="say">say <input class="slot" type="text" value="Hello"/></div>
+          <div class="block b-pink" draggable="true" data-op="color">set color <input class="slot" type="color" value="#ffd166"/></div>
+
+          <span class="cat control">Control</span>
+          <div class="block b-yellow" draggable="true" data-op="wait">wait <input class="slot" type="number" value="0.5" step="0.1"/> seconds</div>
+          <div class="block b-yellow" draggable="true" data-op="repeat" data-nested="true">repeat <input class="slot" type="number" value="5"/> times ↓</div>
+          <div class="block b-purple" draggable="true" data-op="forever" data-nested="true">forever ↓</div>
+          <div class="block b-green" draggable="true" data-op="whenFlag">when Start pressed</div>
+        </div>
+
+        <!-- Workspace -->
+        <div class="panel workspace">
+          <h3>Workspace — drag blocks here</h3>
+          <div id="stack" class="stack" ondragover="DND.allow(event)" ondrop="DND.drop(event)"></div>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button class="btn primary" onclick="Runner.run()">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              Run
+            </button>
+            <button class="btn secondary" onclick="Runner.stop()">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
+              Stop
+            </button>
+            <button class="btn" style="background:linear-gradient(135deg,#ff8fab,#ffc6ff)" onclick="Examples.load('starter')">Load Starter</button>
+            <button class="btn" style="background:linear-gradient(135deg,#80ffea,#56cfe1)" onclick="Examples.load('drawStar')">Load: Draw Star</button>
+            <button class="btn" style="background:linear-gradient(135deg,#baff29,#ffd166)" onclick="Examples.load('dance')">Load: Dance</button>
+          </div>
+        </div>
+
+        <!-- Stage & Goal -->
+        <div class="panel stageWrap">
+          <div class="toolbar">
+            <div>
+              <button class="btn primary" onclick="Runner.run()">
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                Start
+              </button>
+              <span class="stat">x:<span id="sx">0</span> y:<span id="sy">0</span> angle:<span id="sa">0</span>°</span>
+            </div>
+            <div id="badge" class="chip">no mission selected</div>
+          </div>
+          <canvas id="stage" width="360" height="320" tabindex="0" title="Use arrow keys: ↑ move, ←/→ turn, ↓ move back"></canvas>
+          <div class="goalbar">
+            <div class="goaltext" id="goalText">Pick a mission to see its goal.</div>
+            <div class="status" id="goalStatus">in progress</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MISSIONS (Lessons) -->
+    <section id="learn" class="page">
+      <div class="lessons">
+        <div class="panel lesson-list" id="lessonList"></div>
+        <div class="lesson-body" id="lessonBody"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="page">
+      <div class="panel" style="padding:18px">
+        <h3>About kids blockz</h3>
+        <p style="line-height:1.7">kids blockz helps children learn to think like programmers by tackling practical, familiar problems. Instead of abstract puzzles, missions mirror everyday situations—navigating a delivery route, timing a crosswalk light, tracing geometric signs, or guiding a robot vacuum to tidy a messy room. These contexts make concepts “stick,” because children can connect code with actions they recognize.
+        </p>
+        <p style="line-height:1.7"><b>What kids actually learn</b>. Through short, repeatable challenges, learners practice sequencing (ordering steps so things happen in the right order), iteration (repeating actions efficiently), events (reacting to a start signal or keyboard input), variables (numbers and text that can change), and state (position, angle, color). The stage visualizes results instantly, so learners see cause‑and‑effect and can improve their logic by testing and tweaking.
+        </p>
+        <p style="line-height:1.7"><b>Why blocks first?</b> Drag‑and‑drop blocks remove the roadblocks of syntax, typos, and punctuation—letting kids focus on ideas. Once the mental model is strong (loops, conditions, coordinates, timing), learners can transfer those ideas to text‑based languages more confidently.
+        </p>
+        <p style="line-height:1.7"><b>Mission design</b>. Each mission includes a relatable scenario, a crisp goal, and a lightweight auto‑checker. Copy explains <i>why</i> a strategy works (e.g., “a star is a 5‑point polygon with 144° turns”) and nudges toward decomposition: break a big task into small steps, test each step, then combine into a complete solution.
+        </p>
+        <p style="line-height:1.7"><b>Creative play encouraged</b>. Beyond goals, learners can remix colors, messages, and motion to tell stories, draw patterns, or craft simple games. Arrow‑key controls offer an immediate “feel” for motion and angles, building intuition for coordinates and rotation.
+        </p>
+        <p style="line-height:1.7"><b>Privacy‑friendly and classroom‑ready</b>. Works in a modern browser without logins or external services. Teachers can project missions, students can experiment independently, and everyone gets instant feedback from the stage and goal status.
+        </p>
+        <p style="line-height:1.7"><b>Skills that transfer</b>. Planning, debugging, persistence, and communication are baked in. Learners describe their approach (“First I turn 90°, then I repeat 5 times…”) and refine it as they test. These habits power success in math, science, and creative projects well beyond coding.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+  // --------- Simple Router ---------
+  const Nav = { go(page){ document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.page===page)); document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active', p.id===page)); } };
+
+  // --------- Landing canvas flair ---------
+  (function hero() { const c = document.getElementById('heroStage'); if(!c) return; const x = c.getContext('2d'); let t=0; function draw(){ t+=0.02; const w=c.width, h=c.height; x.clearRect(0,0,w,h); const grd = x.createLinearGradient(0,0,0,h); grd.addColorStop(0,'#1a1f5a'); grd.addColorStop(1,'#0f143d'); x.fillStyle=grd; x.fillRect(0,0,w,h); for(let i=0;i<120;i++){ const sx=(i*47%w); const sy=(i*91%h); x.globalAlpha=(Math.sin(t+i)*0.4+0.6); x.fillStyle='#fff'; x.fillRect(sx,sy,2,2);} const cx = w/2 + Math.sin(t)*120; const cy = h/2 + Math.cos(t*1.2)*60; x.save(); x.translate(cx,cy); x.rotate(Math.sin(t)*0.3); x.fillStyle='#ffd166'; x.beginPath(); x.arc(0,0,36,0,Math.PI*2); x.fill(); x.fillStyle='#0a0a0a'; x.fillRect(-6,-10,4,6); x.fillRect(2,-10,4,6); x.restore(); requestAnimationFrame(draw);} draw(); })();
+
+  // --------- Drag & Drop Blocks ---------
+  const DND = { allow(e){ e.preventDefault(); }, drop(e){ e.preventDefault(); const type = e.dataTransfer.getData('text/kidzblock'); if(!type) return; const payload = JSON.parse(type); Stack.addBlock(payload.html, payload.meta); }, };
+  document.addEventListener('DOMContentLoaded', ()=>{
+    document.querySelectorAll('.palette .block').forEach(b=>{ b.addEventListener('dragstart', ev=>{ const cloneHTML = b.outerHTML.replace('draggable="true"',''); const meta = {op:b.dataset.op, nested:!!b.dataset.nested}; ev.dataTransfer.setData('text/kidzblock', JSON.stringify({html:cloneHTML, meta})); }); });
+  });
+
+  // --------- Workspace Stack & Serialization ---------
+  const Stack = {
+    el: null,
+    init(){ this.el = document.getElementById('stack'); },
+    addBlock(html, meta){ const wrap = document.createElement('div'); wrap.className='stackItem'; wrap.innerHTML = html; const block = wrap.firstElementChild; const tools = document.createElement('div'); tools.style.display='flex'; tools.style.gap='6px'; tools.style.margin='-4px 0 6px 0'; const up = this._mkBtn('↑',()=>wrap.previousElementSibling?.before(wrap)); const down = this._mkBtn('↓',()=>wrap.nextElementSibling?.after(wrap)); const del = this._mkBtn('×',()=>wrap.remove()); tools.append(up,down,del); wrap.prepend(tools); if(meta.nested){ const bucket = document.createElement('div'); bucket.className='stack'; bucket.style.margin='8px 0 0 8px'; bucket.ondragover=DND.allow; bucket.ondrop=DND.drop; wrap.appendChild(bucket);} this.el.appendChild(wrap); },
+    _mkBtn(txt,fn){ const b=document.createElement('button'); b.textContent=txt; b.className='btn'; b.style.padding='4px 8px'; b.style.borderRadius='10px'; b.onclick=fn; return b; },
+    serialize(){ function parseContainer(container){ const prog=[]; [...container.children].forEach(node=>{ if(!node.querySelector) return; const block=node.querySelector('.block'); if(!block) return; const op = block.dataset.op; const inputs = [...block.querySelectorAll('.slot')].map(i=> i.type==='number' ? Number(i.value) : i.value); let children=[]; const nest=node.querySelector(':scope > .stack'); if(nest) children = parseContainer(nest); prog.push({op, args:inputs, children}); }); return prog; } return parseContainer(this.el); },
+    clear(){ this.el.innerHTML=''; }
+  };
+
+  // --------- Runner (Interpreter) with trace & goal check + ARROW‑KEY INPUT ---------
+  const Runner = (function(){
+    const c = document.getElementById('stage'); const ctx = c.getContext('2d');
+    const state = {x:c.width/2, y:c.height/2, angle:0, color:'#ffd166', bubble:'', running:false};
+    let stopFlag=false; let trace=[];
+
+    function drawSprite(){ ctx.clearRect(0,0,c.width,c.height); const g = ctx.createLinearGradient(0,0,0,c.height); g.addColorStop(0,'#1e2a7a'); g.addColorStop(1,'#0e1242'); ctx.fillStyle=g; ctx.fillRect(0,0,c.width,c.height); ctx.globalAlpha=.2; ctx.strokeStyle='#9aa3ff'; ctx.beginPath(); for(let i=0;i<c.width;i+=40){ctx.moveTo(i,0);ctx.lineTo(i,c.height);} for(let j=0;j<c.height;j+=40){ctx.moveTo(0,j);ctx.lineTo(c.width,j);} ctx.stroke(); ctx.globalAlpha=1; ctx.save(); ctx.translate(state.x, state.y); ctx.rotate(state.angle*Math.PI/180); ctx.fillStyle=state.color; ctx.beginPath(); ctx.arc(0,0,20,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#0a0a0a'; ctx.fillRect(-5,-6,4,5); ctx.fillRect(2,-6,4,5); ctx.restore(); if(state.bubble){ ctx.fillStyle='rgba(255,255,255,.9)'; ctx.strokeStyle='rgba(0,0,0,.2)'; ctx.lineWidth=2; const padding=8; ctx.font='bold 12px Inter'; const width=ctx.measureText(state.bubble).width+padding*2; const bx=state.x+24, by=state.y-36; ctx.fillRect(bx,by,width,28); ctx.strokeRect(bx,by,width,28); ctx.fillStyle='#000'; ctx.fillText(state.bubble,bx+padding,by+19);} document.getElementById('sx').textContent = state.x|0; document.getElementById('sy').textContent = state.y|0; document.getElementById('sa').textContent = (state.angle%360)|0; }
+
+    function clamp(){ state.x=Math.max(20,Math.min(c.width-20,state.x)); state.y=Math.max(20,Math.min(c.height-20,state.y)); }
+    function wait(ms){ return new Promise(res=>setTimeout(res,ms)); }
+
+    async function exec(prog){ for(const node of prog){ if(stopFlag) return; await execNode(node); } }
+    async function execNode(node){ trace.push({op:node.op, args:node.args}); const [a,b] = node.args||[]; switch(node.op){
+        case 'whenFlag': return;
+        case 'move':{ const steps=a||10; for(let i=0;i<Math.abs(steps);i++){ const rad = state.angle*Math.PI/180; state.x += Math.cos(rad)*Math.sign(steps)*2; state.y += Math.sin(rad)*Math.sign(steps)*2; clamp(); drawSprite(); await wait(16);} return; }
+        case 'turn': state.angle += a||15; drawSprite(); return;
+        case 'goto': state.x = (typeof a==='number'? a:0) + c.width/2; state.y = (typeof b==='number'? b:0) + c.height/2; clamp(); drawSprite(); return;
+        case 'say': state.bubble = (a??'Hello').toString().slice(0,80); drawSprite(); await wait(700); state.bubble=''; drawSprite(); return;
+        case 'color': state.color = a || '#ffd166'; drawSprite(); return;
+        case 'wait': await wait((a||0.5)*1000); return;
+        case 'repeat':{ const times = Math.max(0, Math.min(200, Math.floor(a||5))); for(let i=0;i<times;i++){ if(stopFlag) return; await exec(node.children||[]); } return; }
+        case 'forever':{ let guard=0; while(!stopFlag && guard<200){ await exec(node.children||[]); guard++; } return; }
+        default: return; }
+    }
+
+    function extractProgram(){ const raw = Stack.serialize(); const starts = raw.filter(n=>n.op==='whenFlag'); let prog = raw; if(starts.length){ const idx = raw.findIndex(n=>n.op==='whenFlag'); prog = raw.slice(idx+1);} return prog; }
+
+    // Arrow‑key input always on
+    function keyMove(amount){ const rad = state.angle*Math.PI/180; state.x += Math.cos(rad)*amount; state.y += Math.sin(rad)*amount; clamp(); drawSprite(); }
+    c.addEventListener('keydown', (e)=>{ if(e.key==='ArrowUp'){ keyMove(8); } else if(e.key==='ArrowDown'){ keyMove(-8); } else if(e.key==='ArrowLeft'){ state.angle-=10; drawSprite(); } else if(e.key==='ArrowRight'){ state.angle+=10; drawSprite(); } });
+
+    return { run(){ stopFlag=false; trace=[]; state.x=c.width/2; state.y=c.height/2; state.angle=0; state.bubble=''; drawSprite(); const prog = extractProgram(); this.running=true; exec(prog).then(()=>{this.running=false; Goals.evaluate(trace, state, prog);}); }, stop(){ stopFlag=true; this.running=false; }, state, draw:drawSprite };
+  })();
+
+  Runner.draw(); Stack.init();
+
+  // --------- Goals & Mission linkage ---------
+  const Goals = (function(){
+    let active = null; // mission object
+    function set(lesson){ active = lesson; document.getElementById('goalText').textContent = 'Goal: ' + lesson.goal; document.getElementById('badge').textContent = lesson.title; document.getElementById('goalStatus').textContent='in progress'; }
+    function evaluate(trace, state, prog){ if(!active){ return; } const ok = active.check({trace, state, prog}); document.getElementById('goalStatus').textContent = ok ? 'completed' : 'try again'; return ok; }
+    return { set, evaluate };
+  })();
+
+  // --------- Example Programs ---------
+  const Examples = { load(name){ Stack.clear(); const map={ starter:[ {op:'whenFlag'}, {op:'say', args:["Let's go!"]}, {op:'color', args:['#ffd166']}, {op:'repeat', args:[12], children:[{op:'move', args:[12]},{op:'turn', args:[30]}]}, ], drawStar:[ {op:'whenFlag'}, {op:'color', args:['#06d6a0']}, {op:'repeat', args:[5], children:[{op:'move', args:[50]},{op:'turn', args:[144]}]}, ], dance:[ {op:'whenFlag'}, {op:'repeat', args:[24], children:[{op:'turn', args:[15]},{op:'move', args:[8]},{op:'turn', args:[-15]},{op:'move', args:[-8]}]}, {op:'say', args:['I can dance!']} ] }[name]; if(!map) return; map.forEach(node=>{ const html = Palette.fromOp(node); Stack.addBlock(html.html, html.meta); const host = Stack.el.lastElementChild.querySelector('.block'); const slots = host.querySelectorAll('.slot'); (node.args||[]).forEach((v,i)=>{ if(slots[i]) slots[i].value=v; }); if(host.dataset.nested && node.children){ const bucket = host.parentElement.querySelector(':scope > .stack'); node.children.forEach(ch=>{ const h = Palette.fromOp(ch); const wrap = document.createElement('div'); wrap.innerHTML = h.html; const el = wrap.firstElementChild; const item = document.createElement('div'); item.className='stackItem'; const tools = document.createElement('div'); tools.style.display='flex'; tools.style.gap='6px'; tools.style.margin='-4px 0 6px 0'; const del = document.createElement('button'); del.textContent='×'; del.className='btn'; del.style.padding='4px 8px'; del.style.borderRadius='10px'; del.onclick=()=>item.remove(); tools.appendChild(del); item.appendChild(tools); item.appendChild(el); bucket.appendChild(item); const slots = el.querySelectorAll('.slot'); (ch.args||[]).forEach((v,i)=>{ if(slots[i]) slots[i].value=v; }); }); } }); } };
+
+  const Palette = { fromOp(node){ const op=node.op; switch(op){ case 'whenFlag': return {html:'<div class="block b-green" data-op="whenFlag">when Start pressed</div>', meta:{op:'whenFlag'}}; case 'move': return {html:'<div class="block b-blue" data-op="move">move <input class="slot" type="number" value="10"/> steps</div>', meta:{op:'move'}}; case 'turn': return {html:'<div class="block b-blue" data-op="turn">turn <input class="slot" type="number" value="15"/> degrees</div>', meta:{op:'turn'}}; case 'goto': return {html:'<div class="block b-blue" data-op="goto">go to x <input class="slot" type="number" value="0"/> y <input class="slot" type="number" value="0"/></div>', meta:{op:'goto'}}; case 'say': return {html:'<div class="block b-pink" data-op="say">say <input class="slot" type="text" value="Hello"/></div>', meta:{op:'say'}}; case 'color': return {html:'<div class="block b-pink" data-op="color">set color <input class="slot" type="color" value="#ffd166"/></div>', meta:{op:'color'}}; case 'wait': return {html:'<div class="block b-yellow" data-op="wait">wait <input class="slot" type="number" value="0.5" step="0.1"/> seconds</div>', meta:{op:'wait'}}; case 'repeat': return {html:'<div class="block b-yellow" data-op="repeat" data-nested="true">repeat <input class="slot" type="number" value="5"/> times ↓</div>', meta:{op:'repeat', nested:true}}; case 'forever': return {html:'<div class="block b-purple" data-op="forever" data-nested="true">forever ↓</div>', meta:{op:'forever', nested:true}}; default: return {html:'', meta:{op}}; } } };
+
+  // --------- Minimal Markdown renderer for mission copy ---------
+  function renderMD(s){ return s
+      .replace(/^### (.*)$/gm,'<h4>$1</h4>')
+      .replace(/^## (.*)$/gm,'<h3>$1</h3>')
+      .replace(/^# (.*)$/gm,'<h2>$1</h2>')
+      .replace(/\*\*(.*?)\*\*/g,'<b>$1<\/b>')
+      .replace(/\*(.*?)\*/g,'<i>$1<\/i>')
+      .replace(/`([^`]+)`/g,'<code>$1<\/code>')
+      .replace(/^\- (.*)$/gm,'• $1'); }
+
+  // --------- Helpers for checks ---------
+  function uses(op, prog){ return JSON.stringify(prog).includes(`"op":"${op}"`); }
+  function countTurnsNear(prog, deg){ let n=0; (function scan(list){ list.forEach(nod=>{ if(nod.op==='turn' && Math.abs((nod.args?.[0]||0)-deg)<=5) n++; if(nod.children) scan(nod.children); }); })(prog); return n; }
+  function totalMoves(prog){ let m=0; (function scan(list){ list.forEach(nod=>{ if(nod.op==='move') m+=Math.abs(nod.args?.[0]||0); if(nod.children) scan(nod.children); }); })(prog); return m; }
+
+  // --------- MISSIONS (25) — rewritten as real‑world scenarios ---------
+  const LESSONS = [
+    {id:'l01', title:'1 — Deliver the Welcome Parcel', sample:'starter', goal:'Run any program that moves the sprite to “deliver” a first parcel.', md:`**Scenario**: You’re a courier starting your route. Get your robot to move from the depot.
+**Goal**: Make the sprite move at least once.
+**Hint**: Drag **move** under **when Start pressed**, then **Run**.`, check:({trace})=> trace.some(t=>t.op==='move')},
+
+    {id:'l02', title:'2 — Crossing the Roundabout', sample:'starter', goal:'Turn at least once and move 30+ steps to exit the roundabout.', md:`**Scenario**: Navigate a small roundabout and exit.
+**Goal**: Turn at least once and move **30+** total steps.
+**Think**: small turns + short moves repeated.`, check:({trace,prog})=> trace.some(t=>t.op==='turn') && trace.filter(t=>t.op==='move').reduce((s,t)=>s+Math.abs(t.args?.[0]||0),0)>=30 },
+
+    {id:'l03', title:'3 — Patrolling the Playground', sample:'starter', goal:'Use a repeat loop to move more than 5 times efficiently.', md:`**Scenario**: A safety bot patrols a walkway.
+**Goal**: Use **repeat** so the bot steps forward many times without duplicate blocks.`, check:({trace,prog})=> uses('repeat',prog) && trace.filter(t=>t.op==='move').length>5},
+
+    {id:'l04', title:'4 — Dance Show Timing', sample:'dance', goal:'Use wait inside a loop for smoother timing.', md:`**Scenario**: Your mascot dances to a beat.
+**Goal**: Add **wait** inside a loop to match the rhythm.`, check:({prog})=>{ let ok=false; (function scan(list,inLoop){ list.forEach(n=>{ if(n.op==='wait' && inLoop) ok=true; if(n.children) scan(n.children, inLoop||n.op==='repeat'||n.op==='forever'); }); })(prog,false); return ok; }},
+
+    {id:'l05', title:'5 — Start Button Wiring', sample:'starter', goal:'Include the start event at the top of your stack.', md:`**Scenario**: The game should begin only after the **Start** signal.
+**Goal**: Top block is **when Start pressed**.`, check:({prog})=> prog.length && prog[0].op==='whenFlag' },
+
+    {id:'l06', title:'6 — Map to the Café', sample:'starter', goal:'Use go to x y at least once to jump to a map location.', md:`**Scenario**: Teleport to the café pin on a map.
+**Goal**: Use **go to x y** to position the sprite. Try corners like \`(120,80)\`.`, check:({trace})=> trace.some(t=>t.op==='goto')},
+
+    {id:'l07', title:'7 — Customer Greeting', sample:'starter', goal:'Make the sprite say a friendly message.', md:`**Scenario**: Greet a customer by name.
+**Goal**: Add **say** with any short message.`, check:({trace})=> trace.some(t=>t.op==='say')},
+
+    {id:'l08', title:'8 — Brand Colors', sample:'starter', goal:'Change color during the program like a brand theme.', md:`**Scenario**: Switch your mascot to brand colors mid‑show.
+**Goal**: Use **set color** before or after moving.`, check:({trace})=> trace.some(t=>t.op==='color')},
+
+    {id:'l09', title:'9 — Pedestrian Signal', sample:'starter', goal:'Use at least two waits to time the crossing.', md:`**Scenario**: Simulate a crosswalk signal blinking.
+**Goal**: Place two **wait** blocks to set a beat.`, check:({trace})=> trace.filter(t=>t.op==='wait').length>=2},
+
+    {id:'l10', title:'10 — Star‑Logo Sketch', sample:'drawStar', goal:'Turn ~144° within a 5‑repeat to sketch a star logo.', md:`**Scenario**: Draw a star‑shaped logo.
+**Goal**: Repeat **5** times with a turn near **144°**.`, check:({prog})=> { let ok=false; (function scan(list){ list.forEach(n=>{ if(n.op==='repeat' && Math.round(n.args?.[0])===5){ const turns=countTurnsNear([n],144); if(turns>=1) ok=true; } if(n.children) scan(n.children); }); })(prog); return ok; }},
+
+    {id:'l11', title:'11 — Traffic Cone Slalom', sample:'dance', goal:'Alternate left/right turns inside a loop.', md:`**Scenario**: Weave around cones on a track.
+**Goal**: Inside **repeat**, alternate **turn** left then right.`, check:({prog})=>{ let seq=[]; (function scan(list){ list.forEach(n=>{ if(n.op==='repeat'){ n.children.forEach(c=>{ if(c.op==='turn') seq.push(c.args?.[0]||0); }); } if(n.children) scan(n.children); }); })(prog); return seq.some((v,i)=> i && Math.sign(v)!==Math.sign(seq[i-1])); }},
+
+    {id:'l12', title:'12 — Square Room Clean', sample:'starter', goal:'Create a square path (≈90° turns used 4+ times).', md:`**Scenario**: A robot vacuum cleans a square room.
+**Goal**: Use **90°** turns at least 4 times.`, check:({prog})=> countTurnsNear(prog,90)>=4 },
+
+    {id:'l13', title:'13 — Spiral Garden', sample:'starter', goal:'Use a loop where the move grows each time.', md:`**Scenario**: Water plants in an expanding spiral.
+**Goal**: Grown steps over time (10, 20, 30…).`, check:({prog})=> totalMoves(prog)>=150 && uses('repeat',prog)},
+
+    {id:'l14', title:'14 — Maze Alley', sample:'starter', goal:'Use turn 90 and −90 at least once each to navigate.', md:`**Scenario**: Navigate a narrow alley with two 90° corners.
+**Goal**: Use **turn 90** and **turn -90**.`, check:({prog})=> countTurnsNear(prog,90)>=1 && countTurnsNear(prog,-90)>=1 },
+
+    {id:'l15', title:'15 — Announcements', sample:'starter', goal:'Say two different messages in one run.', md:`**Scenario**: Make two PA announcements.
+**Goal**: Use **say** twice with different text.`, check:({trace})=> trace.filter(t=>t.op==='say').length>=2 },
+
+    {id:'l16', title:'16 — Title → Action', sample:'starter', goal:'Say a title, wait, then move forward.', md:`**Scenario**: Show a title card, hold, then begin.
+**Goal**: Order: **say** → **wait** → **move**.`, check:({trace})=>{ const s=trace.findIndex(t=>t.op==='say'); const w=trace.findIndex(t=>t.op==='wait'); const m=trace.findIndex(t=>t.op==='move'); return s>-1 && w>-1 && m>-1 && s<w && w<m; }},
+
+    {id:'l17', title:'17 — Out‑and‑Back Test Drive', sample:'starter', goal:'Change color, move, then undo with negative move.', md:`**Scenario**: Test drive out, then reverse into the bay.
+**Goal**: Color → move → move negative to return.`, check:({trace})=>{ const mi = trace.findIndex(t=>t.op==='move'); const mj = trace.findIndex((t,i)=> t.op==='move' && i>mi && Math.sign(t.args?.[0]||0)===-Math.sign(trace[mi]?.args?.[0]||1)); return trace.some(t=>t.op==='color') && mi>-1 && mj>-1; }},
+
+    {id:'l18', title:'18 — Parade Announcer', sample:'starter', goal:'Use forever with at least one say inside.', md:`**Scenario**: A commentator repeats short lines along the route.
+**Goal**: Put **say** inside **forever**.`, check:({prog})=>{ let ok=false; (function scan(list,inForever){ list.forEach(n=>{ if(n.op==='say' && inForever) ok=true; if(n.children) scan(n.children, inForever||n.op==='forever'); }); })(prog,false); return ok; }},
+
+    {id:'l19', title:'19 — Corner Tour', sample:'starter', goal:'Visit 3 different coordinates using goto.', md:`**Scenario**: Inspect three checkpoints.
+**Goal**: Use **go to x y** at least three times.`, check:({trace})=> trace.filter(t=>t.op==='goto').length>=3 },
+
+    {id:'l20', title:'20 — Windmill Spinner', sample:'starter', goal:'Spin continuously (turns inside forever).', md:`**Scenario**: Keep a windmill spinning.
+**Goal**: Inside **forever**, keep turning.`, check:({prog})=>{ let ok=false; (function scan(list){ list.forEach(n=>{ if(n.op==='forever'){ ok = ok || n.children.some(c=>c.op==='turn'); } if(n.children) scan(n.children); }); })(prog); return ok; }},
+
+    {id:'l21', title:'21 — Snowflake Art', sample:'starter', goal:'Create a pattern using 6 or 8 equal turns.', md:`**Scenario**: Draw a symmetric snowflake.
+**Goal**: Use **60°** (x6) or **45°** (x8).`, check:({prog})=> countTurnsNear(prog,60)>=6 || countTurnsNear(prog,45)>=8 },
+
+    {id:'l22', title:'22 — Scene Change Cue', sample:'starter', goal:'Use goto, say, wait in that order.', md:`**Scenario**: Move actor to a new scene, announce, then pause.
+**Goal**: **go to** → **say** → **wait**.`, check:({trace})=>{ const a=trace.findIndex(t=>t.op==='goto'); const b=trace.findIndex(t=>t.op==='say'); const c=trace.findIndex(t=>t.op==='wait'); return a>-1 && b>-1 && c>-1 && a<b && b<c; }},
+
+    {id:'l23', title:'23 — Debug the Factory Loop', sample:'starter', goal:'Program must include repeat and at least 1 wait.', md:`**Scenario**: A conveyor needs a timed loop.
+**Goal**: Use both **repeat** and **wait**.`, check:({prog})=> uses('repeat',prog) && uses('wait',prog) },
+
+    {id:'l24', title:'24 — Story Beat Order', sample:'starter', goal:'Say something, change color, then move.', md:`**Scenario**: A story card shows, lights switch, then action.
+**Goal**: **say** → **set color** → **move**.`, check:({trace})=>{ const s=trace.findIndex(t=>t.op==='say'); const c=trace.findIndex(t=>t.op==='color'); const m=trace.findIndex(t=>t.op==='move'); return s>-1 && c>-1 && m>-1 && s<c && c<m; }},
+
+    {id:'l25', title:'25 — Arrow‑Key Rescue', sample:'starter', goal:'Use arrow keys to reach x>300 and y<60, then turn 90°.', md:`**Scenario**: Steer a drone to a person on a rooftop (top‑right).
+**Goal**: Use **↑** and **←/→** to reach the top‑right. When there, add a **turn 90** block and run once.`, check:({state,prog})=> state.x>300 && state.y<60 && countTurnsNear(prog,90)>=1 },
+  ];
+
+  (function buildLessons(){ const list = document.getElementById('lessonList'); const body = document.getElementById('lessonBody'); LESSONS.forEach((L)=>{ const it = document.createElement('div'); it.className='lesson-item'; it.innerHTML = `<b>${L.title}</b><div style="color:var(--muted);font-size:12px;margin-top:4px">Real‑world goal inside</div>`; it.onclick = ()=>{ document.querySelectorAll('.lesson-item').forEach(n=>n.classList.remove('active')); it.classList.add('active'); Goals.set(L); const mdHTML = `<div class='md'>${renderMD(L.md||('**Goal**: '+L.goal))}</div>`; body.innerHTML = `<h4>${L.title}</h4>${mdHTML}<div style=\"margin-top:10px;display:flex;gap:8px\"><button class='btn primary' onclick=\"Examples.load('${L.sample}')\"><svg class='icon' viewBox='0 0 24 24' fill='currentColor'><path d='M8 5v14l11-7z'/></svg> Load Starter</button><button class='btn secondary' onclick=\"Nav.go('play')\"><svg class='icon' viewBox='0 0 24 24' fill='currentColor'><path d='M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z'/></svg> Open Playground</button></div>`; window.scrollTo({top:0,behavior:'smooth'}); }; list.appendChild(it); }); })();
+
+  </script>
+</body>
+</html>
