@@ -3,16 +3,14 @@
 **kids blockz** is a single‑file, zero‑dependency block‑coding playground with 25 mission‑style lessons.
 It runs entirely in the browser—no accounts, servers, or build steps needed.
 
-![screenshot](docs/screenshot-hero.png)
-
 ## Features
 
-- 🧱 Drag‑and‑drop blocks (motion, looks, control) with nested loops
-- ▶️ One‑click **Run/Stop** with a simple interpreter
-- ⌨️ Arrow‑key controls always enabled on the stage
-- 🎯 Goals with lightweight auto‑checking for each mission
-- 🧰 Starter examples (Starter, Draw Star, Dance)
-- 🧪 Works offline, no frameworks
+- Drag‑and‑drop blocks (motion, looks, control) with nested loops
+- One‑click **Run/Stop** with a simple interpreter
+- Arrow‑key controls always enabled on the stage
+- Goals with lightweight auto‑checking for each mission
+- Starter examples (Starter, Draw Star, Dance)
+- Works offline, no frameworks
 
 ## Quick start
 
